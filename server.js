@@ -3,9 +3,12 @@ const multer = require('multer');
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-
 const app = express();
 
+app.get('/debug', async (req, res) => {
+  const { stdout } = await exec('ffmpeg -version');
+  res.send(`<pre>${stdout}</pre>`);
+});
 // Создаём временную папку
 const tmpDir = '/tmp/uploads';
 if (!fs.existsSync(tmpDir)) {
