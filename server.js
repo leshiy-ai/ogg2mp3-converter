@@ -334,7 +334,7 @@ app.post('/pcm2mp3', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Leshiy MP3 converter is ready!');
+  res.send('Leshiy MP3 & Media Converter is ready!');
 });
 
 const port = process.env.PORT || 3000;
