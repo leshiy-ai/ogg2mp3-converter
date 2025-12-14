@@ -131,19 +131,19 @@ CPU    0.1–0.25 vCPU
 Таймаут запроса  ~50 секунд
 Размер файла    рекомендуется ≤ 50 МБ
 
-## 🧪 Пример использования (curl)
+## Пример использования (curl)
 # Поворот изображения:
 bash
-curl -X POST "https://leshiy-mp3-converter.onrender.com/rotate-image?angle=90" \
-  -F "image=@photo.jpg" \
-  -o rotated.jpg
+> curl -X POST "https://leshiy-mp3-converter.onrender.com/rotate-image?angle=90" \
+>  -F "image=@photo.jpg" \
+>  -o rotated.jpg
 
 # PCM → MP3:
 bash
-curl -X POST "https://leshiy-mp3-converter.onrender.com/pcm2mp3?sampleRate=24000" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary @speech.pcm \
-  -o output.mp3
+> curl -X POST "https://leshiy-mp3-converter.onrender.com/pcm2mp3?sampleRate=24000" \
+>  -H "Content-Type: application/octet-stream" \
+>  --data-binary @speech.pcm \
+>  -o output.mp3
   
 ## 📦 Зависимости
 express
