@@ -60,6 +60,17 @@ if (!fs.existsSync(rotateVideoDir)) {
   fs.mkdirSync(rotateVideoDir, { recursive: true });
 }
 
+// Стоп-кадр из видео
+const videoToImageUpload = multer({ 
+  dest: '/tmp/video2image/',
+  limits: { fileSize: 50 * 1024 * 1024 }
+});
+
+const videoToImageDir = '/tmp/video2image';
+if (!fs.existsSync(videoToImageDir)) {
+  fs.mkdirSync(videoToImageDir, { recursive: true });
+}
+
 // Настройка multer: сохраняем как .ogg
 const storage = multer.diskStorage({
   destination: audioUpload,
@@ -221,6 +232,56 @@ app.post('/rotate-video', videoRotateUpload.single('video'), async (req, res) =>
   } catch (error) {
     console.error('Rotate-video error:', error);
     res.status(500).send('Video rotation failed');
+  }
+});
+
+app.post('/video2image', videoToImageUpload.single('video'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send('No video provided');
+    }
+
+    // Время кадра (по умолчанию — 1 секунда)
+    const timestamp = req.query.timestamp || '00:00:01.000'; // формат: HH:MM:SS.mmm
+    const format = (req.query.format || 'jpg').toLowerCase(); // jpg или png
+
+    if (!['jpg', 'png'].includes(format)) {
+      return res.status(400).send('Format must be jpg or png');
+    }
+
+    const inputPath = req.file.path;
+    const outputPath = `/tmp/thumbnail-${Date.now()}.${format}`;
+
+    // Команда FFmpeg
+    const command = `ffmpeg -i "${inputPath}" -ss ${timestamp} -vframes 1 -y "${outputPath}"`;
+
+    await new Promise((resolve, reject) => {
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Video2Image error:', stderr);
+          reject(new Error('Failed to extract frame'));
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    if (!fs.existsSync(outputPath)) {
+      throw new Error('Frame was not extracted');
+    }
+
+    const imgBuffer = fs.readFileSync(outputPath);
+    const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
+    res.setHeader('Content-Type', mimeType);
+    res.send(imgBuffer);
+
+    // Cleanup
+    fs.unlinkSync(inputPath);
+    fs.unlinkSync(outputPath);
+
+  } catch (error) {
+    console.error('Video2Image handler error:', error);
+    res.status(500).send('Frame extraction failed');
   }
 });
 
