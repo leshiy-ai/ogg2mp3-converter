@@ -1,4 +1,4 @@
-# Leshiy MP3 & Media Converter
+# Leshiy Media Converter
 
 Универсальный медиа-конвертер, размещённый на [Render](https://render.com).  
 Преобразует аудио, видео и изображения в форматы, удобные для TTS, Whisper, аватаров и Telegram-ботов.
@@ -17,7 +17,7 @@
 
 # 1. Проверка работоспособности
 GET /
-Leshiy MP3 & Media Converter is ready!
+Leshiy Media Converter is ready!
 
 # 2. Версия FFmpeg
 GET /debug
