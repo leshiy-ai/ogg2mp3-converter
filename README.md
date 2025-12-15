@@ -82,11 +82,16 @@ curl -X POST "[https://leshiy-media-converter.onrender.com/pcm2mp3?sampleRate=24
  -H "Content-Type: application/octet-stream" \
  --data-binary @speech.pcm \
  -o output.mp3
+```
+---
   
 ## 📦 Зависимости
-> express
-> multer
-> ffmpeg (установлен в Dockerfile)
+
+* express
+* multer
+* ffmpeg (установлен в Dockerfile)
+
+---
 
 ## 📜 Лицензия
 MIT © Leshiy (Огорельцев Александр Валерьевич)
