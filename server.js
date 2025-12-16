@@ -542,11 +542,82 @@ app.post('/gif2video', gifToVideoUpload.single('gif'), async (req, res) => {
   }
 });
 
+// Изменение разрешения изображения с сохранением пропорций
+const resizeImageUpload = multer({
+  dest: '/tmp/resize-image/',
+  limits: { fileSize: 10 * 1024 * 1024 } // 10 МБ
+});
+app.post('/resize-image', resizeImageUpload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send('No image provided');
+    }
+
+    const resolution = req.query.resolution || '480p';
+    const resolutions = {
+      '240p': 240,
+      '360p': 360,
+      '480p': 480,
+      '580p': 580,
+      '720p': 720,
+      '1080p': 1080
+    };
+    const height = resolutions[resolution];
+    if (height === undefined) {
+      return res.status(400).send('Invalid resolution. Use: 240p, 360p, 480p, 580p, 720p, 1080p');
+    }
+
+    const inputPath = req.file.path;
+    
+    // Определяем формат выхода по расширению исходного файла
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const outputPath = `/tmp/resized-${Date.now()}${ext}`;
+
+    // FFmpeg: масштабируем по высоте, ширина — пропорционально и чётная
+    const filter = `scale=-2:${height}`;
+    const command = `ffmpeg -i "${inputPath}" -vf "${filter}" -y "${outputPath}"`;
+
+    await new Promise((resolve, reject) => {
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Resize-image error:', stderr);
+          reject(new Error('FFmpeg resize failed'));
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    if (!fs.existsSync(outputPath)) {
+      throw new Error('Resized image not created');
+    }
+
+    const imgBuffer = fs.readFileSync(outputPath);
+    const mimeType = ext === '.png' ? 'image/png' : 'image/jpeg';
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Length', imgBuffer.length);
+    res.send(imgBuffer);
+
+    // Cleanup
+    fs.unlinkSync(inputPath);
+    fs.unlinkSync(outputPath);
+
+  } catch (error) {
+    console.error('Resize-image handler error:', error);
+    res.status(500).send(`Resize failed: ${error.message}`);
+  }
+});
+
 // Конвертация видео в заданное разрешение
 const resizeUpload = multer({
   dest: '/tmp/resize-video/',
   limits: { fileSize: 50 * 1024 * 1024 } // 50 МБ
 });
+const resizeVideoDir = '/tmp/resize-video';
+if (!fs.existsSync(resizeVideoDir)) {
+  fs.mkdirSync(resizeVideoDir, { recursive: true });
+}
 app.post('/resize-video', resizeUpload.single('video'), async (req, res) => {
   try {
     if (!req.file) {
