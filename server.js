@@ -559,6 +559,7 @@ app.post('/resize-image', resizeImageUpload.single('image'), async (req, res) =>
       '360p': 360,
       '480p': 480,
       '580p': 580,
+      '640p': 640,
       '720p': 720,
       '1080p': 1080,
       '1440p': 1440,
@@ -568,7 +569,7 @@ app.post('/resize-image', resizeImageUpload.single('image'), async (req, res) =>
     };
     const height = resolutions[resolution];
     if (height === undefined) {
-      return res.status(400).send('Invalid resolution. Use: 240p, 360p, 480p, 580p, 720p, 1080p, 1440p, 2160p');
+      return res.status(400).send('Invalid resolution. Use: 240p, 360p, 480p, 580p, 640p, 720p, 1080p, 1440p, 2160p');
     }
 
     const inputPath = req.file.path;
@@ -634,6 +635,7 @@ app.post('/resize-video', resizeUpload.single('video'), async (req, res) => {
       '360p': 360,
       '480p': 480,
       '580p': 580,
+      '640p': 640,
       '720p': 720,
       '1080p': 1080,
       '1440p': 1440,
@@ -643,7 +645,7 @@ app.post('/resize-video', resizeUpload.single('video'), async (req, res) => {
     };
     const height = resolutions[resolution];
     if (height === undefined) {
-      return res.status(400).send('Invalid resolution. Use: 240p, 360p, 480p, 580p, 720p, 1080p, 1440p, 2160p');
+      return res.status(400).send('Invalid resolution. Use: 240p, 360p, 480p, 580p, 640p, 720p, 1080p, 1440p, 2160p');
     }
 
     const inputPath = req.file.path;
